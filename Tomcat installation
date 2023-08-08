@@ -1,0 +1,75 @@
+#TOMCAT INSTALLATION (FOR HOSTING JAVA WEB APPLICATIONS)
+
+# Prerequisites (At least T2-Micro EC2)
+sudo hostnamectl set-hostname tomcat
+sudo apt update -y
+sudo apt install default-jdk -y
+# sudo apt install openjdk-17-jre -y
+# sudo apt-get install openjdk-8-jdk -y
+# java -version
+sudo apt install vim wget git unzip -y
+
+
+# Create tomcat user and grant sudo privileges
+sudo useradd -m -d /opt/tomcat -s /bin/bash -U tomcat
+sudo echo "tomcat ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/tomcat
+
+
+# Download tomcat binary file and extract
+cd /opt
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.78/bin/apache-tomcat-9.0.78.zip
+sudo unzip apache-tomcat-9.0.78.zip
+sudo rm -rf apache-tomcat-9.0.78.zip
+sudo mv apache-tomcat-9.0.78 tomcat
+
+# Or use curl in case wget gives issues
+## sudo apt install curl -y
+## sudo curl -O https://mirror.kiu.ac.ug/apache/tomcat/tomcat-9/v9.0.45/bin/apache-tomcat-9.0.45.tar.gz
+
+
+# Change Permissions and Ownership
+sudo chown -R tomcat: /opt/tomcat
+sudo sh -c 'chmod +x /opt/tomcat/bin/*.sh'
+
+
+## sudo vi /etc/systemd/system/tomcat.service
+### paste the content below
+
+# [Unit]
+# Description=Tomcat 9.0 servlet container
+# After=network.target
+
+# [Service]
+# Type=forking
+
+# User=tomcat
+# Group=tomcat
+
+# Environment="JAVA_HOME=/usr/lib/jvm/default-java"
+# Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
+
+# Environment="CATALINA_BASE=/opt/tomcat"
+# Environment="CATALINA_HOME=/opt/tomcat"
+# Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
+# Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
+
+# ExecStart=/opt/tomcat/latest/bin/startup.sh
+# ExecStop=/opt/tomcat/latest/bin/shutdown.sh
+
+# [Install]
+# WantedBy=multi-user.target
+
+
+
+## Reload daemon and start tomcat
+sudo systemctl daemon-reload
+sudo systemctl start tomcat
+sudo systemctl enable tomcat	#Start tomcat each time server starts running
+sudo systemctl status tomcat
+
+## Open tomcat application port on server
+# sudo ufw allow 8080/tcp
+
+
+## Create tomcat users and assign roles in /opt/tomcat/conf/tomcat-users.xml
+## To manage tomcat externally, find and edit context.xml
