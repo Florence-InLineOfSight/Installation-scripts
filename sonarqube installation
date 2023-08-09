@@ -1,0 +1,49 @@
+#SONARQUBE INSTALLATION MANUAL/SCRIPT
+
+##Prerequisites (T2-Medium EC2)
+sudo hostnamectl set-hostname SonarQube
+sudo apt update -y
+sudo apt install default-jdk -y
+sudo apt install wget git unzip vim -y
+
+##Download and extract SonarQube directory
+cd /opt
+sudo wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.2.46101.zip
+sudo unzip sonarqube-8.9.2.46101.zip
+sudo rm -rf sonarqube-8.9.2.46101.zip
+sudo mv sonarqube-8.9.2.46101 sonarqube
+
+##Create sonar user and assign permissions/ownership
+sudo useradd -m -d /opt/sonarqube -s /bin/bash -U sonar
+sudo echo "sonar ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/sonar
+sudo chown -R sonar: /opt/sonarqube
+
+
+##Configure sonarqube to run as a service
+sudo vi /etc/systemd/system/sonarqube.service
+
+##PASTE THE CONTENT BELOW IN THE FILE ABOVE (uncomment before pasting)
+# [Unit]
+# Description=SonarQube service
+# After=syslog.target network.target
+
+# [Service]
+# Type=forking
+# User=sonar
+# Environment="JAVA_HOME=/usr/lib/jvm/default-java"
+# Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
+# ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+# ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+# Restart=always
+# LimitNOFILE=65536
+
+# [Install]
+# WantedBy=multi-user.target
+
+
+
+##Start sonarqube
+sudo systemctl daemon-reload	#Reload daemon after service configurations
+sudo systemctl enable sonarqube	#Enable sonarqube to start upon boot
+sudo systemctl start sonarqube
+sudo systemctl status sonarqube
