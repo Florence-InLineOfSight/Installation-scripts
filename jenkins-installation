@@ -15,4 +15,6 @@ sudo apt-get update -y
 sudo apt-get install jenkins -y
 sudo echo "jenkins ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/jenkins #Give jenkins sudo rights
 
+sudo systemctl enable jenkins
+
 java -version
