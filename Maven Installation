@@ -1,10 +1,20 @@
+#!/bin/bash
+
+# Set the Maven version
+MAVEN_VERSION="3.9.7"
+
+# Install prerequisites
 sudo apt-get update
 sudo apt-get install default-jdk wget unzip -y
-wget https://dlcdn.apache.org/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.zip
-unzip apache-maven-3.9.7-bin.zip
-rm -rf apache-maven-3.9.7-bin.zip
-sudo mv apache-maven-3.9.7 /opt/maven
+
+# Download and extract Maven
+wget https://dlcdn.apache.org/maven/maven-$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.zip
+unzip apache-maven-$MAVEN_VERSION-bin.zip
+rm -rf apache-maven-$MAVEN_VERSION-bin.zip
+sudo mv apache-maven-$MAVEN_VERSION /opt/maven
+
+# Set Maven environment variables
 sudo echo "export MAVEN_HOME=/opt/maven" >> /etc/profile.d/maven.sh
-sudo echo "export PATH=${MAVEN_HOME}/bin:${PATH}" >> /etc/profile.d/maven.sh
+sudo echo "export PATH=\${MAVEN_HOME}/bin:\${PATH}" >> /etc/profile.d/maven.sh
 sudo chmod +x /etc/profile.d/maven.sh
 source /etc/profile.d/maven.sh
